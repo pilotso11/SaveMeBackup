@@ -39,6 +39,9 @@ public final class UndoPlugin extends JavaPlugin {
 
     private int hourlyTaskId = -1;
     private int dailyTaskId = -1;
+    private boolean verboseLog = false;
+    private boolean dailyOff;
+    private boolean periodicOff;
 
     @Override
     public void onEnable() {
@@ -46,9 +49,17 @@ public final class UndoPlugin extends JavaPlugin {
             // enable default config
             saveDefaultConfig();
 
+            // load log config
+            verboseLog = getConfig().getString("verbose-log").equalsIgnoreCase("true");
+            dailyOff = getConfig().getString("daily-off").equalsIgnoreCase("true");
+            periodicOff = getConfig().getString("periodic-off").equalsIgnoreCase("true");
+
             // schedule jobs
-            scheduleHourlyJob();
-            scheduleDailyJob();
+            if(!periodicOff)
+                scheduleHourlyJob();
+            if(!dailyOff)
+                scheduleDailyJob();
+
 
         } catch (Throwable t) {
             getLogger().log(Level.WARNING, "Exception in savemebackup.onEnable: " + t.getMessage(), t);
@@ -223,13 +234,13 @@ public final class UndoPlugin extends JavaPlugin {
 
             // Add the files
             for (String f : files) {
-                if (sender != null)
+                if (sender != null && verboseLog)
                     sender.sendMessage("Next File: " + f);
                 processFile(new File(f), zip);
             }
 
             for (String fld : folders) {
-                if (sender != null)
+                if (sender != null && verboseLog)
                     sender.sendMessage("Next Folder: " + fld);
                 processFile(new File(fld), zip);
             }
@@ -257,7 +268,9 @@ public final class UndoPlugin extends JavaPlugin {
         }
 
         // Add file to zip
-        getLogger().fine("Adding to zip: " + file.getAbsolutePath());
+        if(verboseLog)
+            getLogger().fine("Adding to zip: " + file.getAbsolutePath());
+
         zip.putNextEntry(new ZipEntry(file.getPath()));
         FileInputStream reader = new FileInputStream(file);
         try {

@@ -4,6 +4,14 @@ frequency: 60m
 saveday: save/saveme-daily.zip
 keepday: 3
 daily-at: "12:15:00"
+# Set to true to enable logging of each file backed up
+verbose-log: false
+# set to true to disable the daily backup, regardless of settings above.
+# disabled backups can still be run manually
+daily-off: false
+# set to true to disable the periodic backup, regardless of settings above.
+# disabled backups can still be run manually
+periodic-off: false
 files:
   - white-list.txt
   - ops.txt
